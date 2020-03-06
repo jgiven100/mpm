@@ -320,6 +320,16 @@ bool mpm::MPMExplicit<Tdim>::solve() {
     if (this->stress_update_ == mpm::StressUpdate::USL)
       this->compute_stress_strain(phase);
 
+    // Check plastic strain particles
+    auto removing_particles = mesh_->check_plasticity_mesh();
+
+    if (!removing_particles.empty()) {
+       for (auto i : removing_particles) {
+         std::cout << "Sand production particle: " << i->id() << '\n';
+         mesh_->remove_particle(i);
+       }
+    }
+
     // Locate particles
     auto unlocatable_particles = mesh_->locate_particles_mesh();
 
@@ -332,7 +342,8 @@ bool mpm::MPMExplicit<Tdim>::solve() {
        }
        // Do not Throw
        // throw std::runtime_error("Particle outside the mesh domain");
-     }
+    }
+
 
 #ifdef USE_MPI
 #ifdef USE_GRAPH_PARTITIONING

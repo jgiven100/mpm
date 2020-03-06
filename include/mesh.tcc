@@ -741,6 +741,24 @@ std::vector<std::shared_ptr<mpm::ParticleBase<Tdim>>>
   return particles;
 }
 
+//! Check for plasticity of material points
+template <unsigned Tdim>
+std::vector<std::shared_ptr<mpm::ParticleBase<Tdim>>>
+    mpm::Mesh<Tdim>::check_plasticity_mesh() {
+
+  std::vector<std::shared_ptr<mpm::ParticleBase<Tdim>>> particles;
+
+  std::for_each(particles_.cbegin(), particles_.cend(),
+                [=, &particles](
+                    const std::shared_ptr<mpm::ParticleBase<Tdim>>& particle) {
+                  // If particle is not found in mesh add to a list of particles
+                  if (particle->state_variable("epds") > 0.003)
+                    particles.emplace_back(particle);
+                });
+
+  return particles;
+}
+
 //! Locate particles in a cell
 template <unsigned Tdim>
 bool mpm::Mesh<Tdim>::locate_particle_cells(

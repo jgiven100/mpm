@@ -321,15 +321,16 @@ bool mpm::MPMExplicit<Tdim>::solve() {
       this->compute_stress_strain(phase);
 
     // Check plastic strain particles
-    auto removing_particles;
-    if (step_ > 40000)
-      removing_particles = mesh_->check_plasticity_mesh();
+    if (step_ > 40000) {
 
-    if (!removing_particles.empty()) {
-       for (auto i : removing_particles) {
-         std::cout << "Sand production particle: " << i->id() << '\n';
-         mesh_->remove_particle(i);
-       }
+      auto removing_particles = mesh_->check_plasticity_mesh();
+
+      if (!removing_particles.empty()) {
+         for (auto i : removing_particles) {
+           std::cout << "Sand production particle: " << i->id() << '\n';
+           mesh_->remove_particle(i);
+         }
+      }
     }
 
     // Locate particles

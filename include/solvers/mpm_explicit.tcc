@@ -321,7 +321,7 @@ bool mpm::MPMExplicit<Tdim>::solve() {
       this->compute_stress_strain(phase);
 
     // Check plastic strain particles
-    if (step_ > 40000) {
+    if (step_ == 40000 || step_ == 42000 || step_ == 44000 || step_ == 46000 || step_ == 48000 || step_ == 50000) {
 
       auto removing_particles = mesh_->check_plasticity_mesh();
 

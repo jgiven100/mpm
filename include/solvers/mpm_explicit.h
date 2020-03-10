@@ -81,6 +81,9 @@ class MPMExplicit : public MPMBase<Tdim> {
   //! Interface
   bool interface_{false};
 
+  //! Mass loss
+  double mass_loss_{0};
+
 };  // MPMExplicit class
 }  // namespace mpm
 

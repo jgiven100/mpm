@@ -327,6 +327,8 @@ bool mpm::MPMExplicit<Tdim>::solve() {
         if (!removing_particles.empty()) {
            for (auto i : removing_particles) {
              std::cout << "Sand production particle: " << i->id() << '\n';
+             this->mass_loss_ += i->mass();
+             std::cout << "Sand production mass loss: " << this->mass_loss_ << '\n';
              mesh_->remove_particle(i);
            }
         }

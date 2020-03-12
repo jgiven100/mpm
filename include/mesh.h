@@ -24,7 +24,6 @@
 using Json = nlohmann::json;
 
 #include "cell.h"
-#include "container.h"
 #include "factory.h"
 #include "friction_constraint.h"
 #include "function_base.h"
@@ -34,12 +33,13 @@ using Json = nlohmann::json;
 #include "io.h"
 #include "io_mesh.h"
 #include "logger.h"
-#include "material/material.h"
+#include "material.h"
 #include "mpi_datatypes.h"
 #include "node.h"
 #include "particle.h"
 #include "particle_base.h"
 #include "traction.h"
+#include "vector.h"
 #include "velocity_constraint.h"
 
 namespace mpm {
@@ -165,11 +165,13 @@ class Mesh {
   //! \param[in] particle_type Particle type
   //! \param[in] coordinates Nodal coordinates
   //! \param[in] material_id ID of the material
+  //! \param[in] pset_id Set ID of the particles
   //! \param[in] check_duplicates Parameter to check duplicates
   //! \retval status Create particle status
   bool create_particles(const std::string& particle_type,
                         const std::vector<VectorDim>& coordinates,
-                        unsigned material_id, bool check_duplicates = true);
+                        unsigned material_id, unsigned pset_id,
+                        bool check_duplicates = true);
 
   //! Add a particle to the mesh
   //! \param[in] particle A shared pointer to particle
@@ -333,10 +335,12 @@ class Mesh {
   //! \param[in] particle_type Particle type
   //! \param[in] material_id ID of the material
   //! \param[in] cset_id Set ID of the cell [-1 for all cells]
+  //! \param[in] pset_id Set ID of the particles
   //! \retval point Material point coordinates
   bool generate_material_points(unsigned nquadratures,
                                 const std::string& particle_type,
-                                unsigned material_id, int cset_id);
+                                unsigned material_id, int cset_id,
+                                unsigned pset_id);
 
   //! Initialise material models
   //! \param[in] materials Material models
@@ -347,7 +351,15 @@ class Mesh {
   }
 
   //! Find cell neighbours
-  void compute_cell_neighbours();
+  void find_cell_neighbours();
+
+  //! Find particle neighbours
+  //! \param[in] cell of interest
+  void find_particle_neighbours();
+
+  //! Find particle neighbours
+  //! \param[in] cell of interest
+  void find_particle_neighbours(const std::shared_ptr<mpm::Cell<Tdim>>& cell);
 
   //! Add a neighbour mesh, using the local id for the new mesh and a mesh
   //! pointer
@@ -385,7 +397,7 @@ class Mesh {
   //! Return node pairs
   std::vector<std::array<mpm::Index, 2>> node_pairs() const;
 
-  //! Create map of container of particles in sets
+  //! Create map of vector of particles in sets
   //! \param[in] map of particles ids in sets
   //! \param[in] check_duplicates Parameter to check duplicates
   //! \retval status Status of  create particle sets
@@ -393,7 +405,7 @@ class Mesh {
       const tsl::robin_map<mpm::Index, std::vector<mpm::Index>>& particle_sets,
       bool check_duplicates);
 
-  //! Create map of container of nodes in sets
+  //! Create map of vector of nodes in sets
   //! \param[in] map of nodes ids in sets
   //! \param[in] check_duplicates Parameter to check duplicates
   //! \retval status Status of  create node sets
@@ -401,7 +413,7 @@ class Mesh {
       const tsl::robin_map<mpm::Index, std::vector<mpm::Index>>& node_sets,
       bool check_duplicates);
 
-  //! Create map of container of cells in sets
+  //! Create map of vector of cells in sets
   //! \param[in] map of cells ids in sets
   //! \param[in] check_duplicates Parameter to check duplicates
   //! \retval status Status of  create cell sets
@@ -409,8 +421,8 @@ class Mesh {
       const tsl::robin_map<mpm::Index, std::vector<mpm::Index>>& cell_sets,
       bool check_duplicates);
 
-  //! Get the container of cell
-  mpm::Container<Cell<Tdim>> cells();
+  //! Get the vector of cell
+  mpm::Vector<Cell<Tdim>> cells();
 
   //! Return particle cell ids
   std::map<mpm::Index, mpm::Index>* particles_cell_ids();
@@ -432,8 +444,9 @@ class Mesh {
 
  private:
   // Read particles from file
+  //! \param[in] pset_id Set ID of the particles
   bool read_particles_file(const std::shared_ptr<mpm::IO>& io,
-                           const Json& generator);
+                           const Json& generator, unsigned pset_id);
 
   // Locate a particle in mesh cells
   bool locate_particle_cells(
@@ -444,38 +457,38 @@ class Mesh {
   unsigned id_{std::numeric_limits<unsigned>::max()};
   //! Isoparametric mesh
   bool isoparametric_{true};
-  //! Container of mesh neighbours
+  //! Vector of mesh neighbours
   Map<Mesh<Tdim>> neighbour_meshes_;
-  //! Container of particles
-  Container<ParticleBase<Tdim>> particles_;
-  //! Container of particles ids and cell ids
+  //! Vector of particles
+  Vector<ParticleBase<Tdim>> particles_;
+  //! Vector of particles ids and cell ids
   std::map<mpm::Index, mpm::Index> particles_cell_ids_;
-  //! Container of particle sets
+  //! Vector of particle sets
   tsl::robin_map<unsigned, tbb::concurrent_vector<mpm::Index>> particle_sets_;
   //! Map of particles for fast retrieval
   Map<ParticleBase<Tdim>> map_particles_;
-  //! Container of nodes
-  Container<NodeBase<Tdim>> nodes_;
-  //! Container of domain shared nodes
-  Container<NodeBase<Tdim>> domain_shared_nodes_;
+  //! Vector of nodes
+  Vector<NodeBase<Tdim>> nodes_;
+  //! Vector of domain shared nodes
+  Vector<NodeBase<Tdim>> domain_shared_nodes_;
   //! Boundary nodes
-  Container<NodeBase<Tdim>> boundary_nodes_;
-  //! Container of node sets
-  tsl::robin_map<unsigned, Container<NodeBase<Tdim>>> node_sets_;
-  //! Container of active nodes
-  Container<NodeBase<Tdim>> active_nodes_;
+  Vector<NodeBase<Tdim>> boundary_nodes_;
+  //! Vector of node sets
+  tsl::robin_map<unsigned, Vector<NodeBase<Tdim>>> node_sets_;
+  //! Vector of active nodes
+  Vector<NodeBase<Tdim>> active_nodes_;
   //! Map of nodes for fast retrieval
   Map<NodeBase<Tdim>> map_nodes_;
   //! Map of cells for fast retrieval
   Map<Cell<Tdim>> map_cells_;
-  //! Container of cells
-  Container<Cell<Tdim>> cells_;
-  //! Container of ghost cells sharing the current MPI rank
-  Container<Cell<Tdim>> ghost_cells_;
-  //! Container of local ghost cells
-  Container<Cell<Tdim>> local_ghost_cells_;
-  //! Container of cell sets
-  tsl::robin_map<unsigned, Container<Cell<Tdim>>> cell_sets_;
+  //! Vector of cells
+  Vector<Cell<Tdim>> cells_;
+  //! Vector of ghost cells sharing the current MPI rank
+  Vector<Cell<Tdim>> ghost_cells_;
+  //! Vector of local ghost cells
+  Vector<Cell<Tdim>> local_ghost_cells_;
+  //! Vector of cell sets
+  tsl::robin_map<unsigned, Vector<Cell<Tdim>>> cell_sets_;
   //! Map of ghost cells to the neighbours ranks
   std::map<unsigned, std::vector<unsigned>> ghost_cells_neighbour_ranks_;
   //! Faces and cells

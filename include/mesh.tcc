@@ -844,8 +844,12 @@ std::vector<std::shared_ptr<mpm::ParticleBase<Tdim>>>
   std::for_each(particles_.cbegin(), particles_.cend(),
                 [=, &particles](
                     const std::shared_ptr<mpm::ParticleBase<Tdim>>& particle) {
-                  // If particle is not found in mesh add to a list of particles
-                  if (particle->state_variable("epds") > 0.004)
+                  double mean_p{(-1 / 3) *
+                                (particle->stress()[0] + particle->stress()[1] +
+                                 particle->stress()[2])};
+                  const double a{1.5E-3};
+                  const double b{5.0E-5};
+                  if (particle->state_variable("epds") > (a + (mean_p * b)))
                     particles.emplace_back(particle);
                 });
 

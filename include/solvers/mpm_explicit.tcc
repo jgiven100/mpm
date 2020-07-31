@@ -292,6 +292,20 @@ bool mpm::MPMExplicit<Tdim>::solve() {
     if (this->stress_update_ == mpm::StressUpdate::USL)
       this->compute_stress_strain(phase);
 
+    // Check plastic strain particles
+    if (step_ % 5000 == 0) {
+      auto removing_particles = mesh_->check_plasticity_mesh();
+
+      if (!removing_particles.empty()) {
+        for (auto i : removing_particles) {
+          this->mass_loss_ += i->mass();
+          std::cout << "Sand production particle: " << i->id() << '\t'
+                    << "Cumulative mass loss: " << this->mass_loss_ << '\n';
+          mesh_->remove_particle(i);
+        }
+      }
+    }
+
     // Locate particles
     auto unlocatable_particles = mesh_->locate_particles_mesh();
 

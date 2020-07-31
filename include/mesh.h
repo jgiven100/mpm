@@ -244,6 +244,10 @@ class Mesh {
   //! \retval particles Particles which cannot be located in the mesh
   std::vector<std::shared_ptr<mpm::ParticleBase<Tdim>>> locate_particles_mesh();
 
+  //! Check plastic strain particles
+  //! \retval particles which are greater than selected plasticity criteria
+  std::vector<std::shared_ptr<mpm::ParticleBase<Tdim>>> check_plasticity_mesh();
+
   //! Iterate over particles
   //! \tparam Toper Callable object typically a baseclass functor
   template <typename Toper>

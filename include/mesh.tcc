@@ -974,6 +974,27 @@ std::vector<std::shared_ptr<mpm::ParticleBase<Tdim>>>
   return particles;
 }
 
+//! Check plastic strain particles
+template <unsigned Tdim>
+std::vector<std::shared_ptr<mpm::ParticleBase<Tdim>>>
+    mpm::Mesh<Tdim>::check_plasticity_mesh() {
+
+  std::vector<std::shared_ptr<mpm::ParticleBase<Tdim>>> particles;
+  std::for_each(particles_.cbegin(), particles_.cend(),
+                [=, &particles](
+                    const std::shared_ptr<mpm::ParticleBase<Tdim>>& particle) {
+                  double mean_p{(-1 / 3) *
+                                (particle->stress()[0] + particle->stress()[1] +
+                                 particle->stress()[2])};
+                  const double a{1.5E-3};
+                  const double b{5.0E-5};
+                  if (particle->state_variable("pdstrain") > (a + (mean_p * b)))
+                    particles.emplace_back(particle);
+                });
+
+  return particles;
+}
+
 //! Locate particles in a cell
 template <unsigned Tdim>
 bool mpm::Mesh<Tdim>::locate_particle_cells(

@@ -980,15 +980,15 @@ std::vector<std::shared_ptr<mpm::ParticleBase<Tdim>>>
     mpm::Mesh<Tdim>::check_plasticity_mesh() {
 
   std::vector<std::shared_ptr<mpm::ParticleBase<Tdim>>> particles;
+
   std::for_each(particles_.cbegin(), particles_.cend(),
                 [=, &particles](
                     const std::shared_ptr<mpm::ParticleBase<Tdim>>& particle) {
-                  double mean_p{(-1 / 3) *
-                                (particle->stress()[0] + particle->stress()[1] +
-                                 particle->stress()[2])};
-                  const double a{1.5E-3};
-                  const double b{5.0E-5};
-                  if (particle->state_variable("pdstrain") > (a + (mean_p * b)))
+                  auto stress = particle->stress();
+                  double mean_s = (-1. / 2.) * (stress[0] + stress[1]);
+                  const double a = 0.0005;
+                  const double b = 1.0E-10;
+                  if (particle->state_variable("pdstrain") > (a + (mean_s * b)))
                     particles.emplace_back(particle);
                 });
 

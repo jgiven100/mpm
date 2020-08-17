@@ -660,11 +660,20 @@ template <unsigned Tdim>
 void mpm::Particle<Tdim>::compute_stress() noexcept {
   // Check if material ptr is valid
   assert(this->material() != nullptr);
+  // Save old pdstrain
+  auto old_pdstrain =
+      state_variables_[mpm::ParticlePhase::Solid].at("pdstrain");
   // Calculate stress
   this->stress_ =
       (this->material())
           ->compute_stress(stress_, dstrain_, this,
                            &state_variables_[mpm::ParticlePhase::Solid]);
+  // Save new pdstrain
+  auto new_pdstrain =
+      state_variables_[mpm::ParticlePhase::Solid].at("pdstrain");
+  // Compare old and new
+  (old_pdstrain == new_pdstrain) ? to_be_removed_ = true
+                                 : to_be_removed_ = false;
 }
 
 //! Map body force

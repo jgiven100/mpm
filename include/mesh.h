@@ -248,6 +248,10 @@ class Mesh {
   //! \retval particles which are greater than selected plasticity criteria
   std::vector<std::shared_ptr<mpm::ParticleBase<Tdim>>> check_plasticity_mesh();
 
+  //! Check to_be_removed_ bool for particles
+  //! \retval particles which to_be_removed_ is true
+  std::vector<std::shared_ptr<mpm::ParticleBase<Tdim>>> check_particle_bool();
+
   //! Iterate over particles
   //! \tparam Toper Callable object typically a baseclass functor
   template <typename Toper>

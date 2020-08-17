@@ -338,6 +338,8 @@ class Particle : public ParticleBase<Tdim> {
   using ParticleBase<Tdim>::state_variables_;
   //! Neighbour particles
   using ParticleBase<Tdim>::neighbours_;
+  //! Removal criteria
+  using ParticleBase<Tdim>::to_be_removed_;
   //! Volumetric mass density (mass / volume)
   double mass_density_{0.};
   //! Mass

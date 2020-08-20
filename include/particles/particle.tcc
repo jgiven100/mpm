@@ -856,6 +856,49 @@ bool mpm::Particle<Tdim>::compute_pressure_smoothing(unsigned phase) noexcept {
   return status;
 }
 
+//! Map particle pdstrain to nodes
+template <unsigned Tdim>
+bool mpm::Particle<Tdim>::map_pdstrain_to_nodes(unsigned phase) noexcept {
+  // Mass is initialized
+  assert(mass_ != std::numeric_limits<double>::max());
+
+  bool status = false;
+  // Check if particle mass is set and pdstrain is found
+  if (mass_ != std::numeric_limits<double>::max() &&
+      (state_variables_[phase].find("pdstrain") !=
+       state_variables_[phase].end())) {
+    // Map particle pdstrain to nodes
+    for (unsigned i = 0; i < nodes_.size(); ++i)
+      nodes_[i]->update_mass_pdstrain(
+          phase, shapefn_[i] * mass_ * state_variables_[phase]["pdstrain"]);
+
+    status = true;
+  }
+  return status;
+}
+
+// Compute pdstrain smoothing of the particle based on nodal pdstrain
+template <unsigned Tdim>
+bool mpm::Particle<Tdim>::compute_pdstrain_smoothing(unsigned phase) noexcept {
+  // Assert
+  assert(cell_ != nullptr);
+
+  bool status = false;
+  // Check if particle has a valid cell ptr
+  if (cell_ != nullptr && (state_variables_[phase].find("pdstrain") !=
+                           state_variables_[phase].end())) {
+
+    double pdstrain = 0.;
+    // Update particle pdstrain to interpolated nodal pdstrain
+    for (unsigned i = 0; i < this->nodes_.size(); ++i)
+      pdstrain += shapefn_[i] * nodes_[i]->pdstrain(phase);
+
+    state_variables_[phase]["pdstrain_smooth"] = pdstrain;
+    status = true;
+  }
+  return status;
+}
+
 //! Apply particle velocity constraints
 template <unsigned Tdim>
 void mpm::Particle<Tdim>::apply_particle_velocity_constraints(unsigned dir,

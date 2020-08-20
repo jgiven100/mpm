@@ -94,6 +94,10 @@ class MPMBase : public MPM {
   //! \param[in] phase Phase to smooth pressure
   void pressure_smoothing(unsigned phase);
 
+  //! pdtrain smoothing
+  //! \param[in] phase Phase to smooth pdstrain
+  void pdstrain_smoothing(unsigned phase);
+
  private:
   //! Return if a mesh will be isoparametric or not
   //! \retval isoparametric Status of mesh type

@@ -256,6 +256,15 @@ class Particle : public ParticleBase<Tdim> {
   bool compute_pressure_smoothing(
       unsigned phase = mpm::ParticlePhase::Solid) noexcept override;
 
+  //! Map particle pdstrain to nodes
+  bool map_pdstrain_to_nodes(
+      unsigned phase = mpm::ParticlePhase::Solid) noexcept override;
+
+  //! Compute pdstrain smoothing of the particle based on nodal pressure
+  //! $$\hat{p}_p = \sum_{i = 1}^{n_n} N_i(x_p) p_i$$
+  bool compute_pdstrain_smoothing(
+      unsigned phase = mpm::ParticlePhase::Solid) noexcept override;
+
   //! Return pressure of the particles
   //! \param[in] phase Index to indicate phase
   double pressure(unsigned phase = mpm::ParticlePhase::Solid) const override {

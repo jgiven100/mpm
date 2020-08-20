@@ -95,7 +95,9 @@ mpm::dense_map mpm::NorSand<Tdim>::initialise_state_variables() {
       {"plastic_strain2", 0.},
       {"plastic_strain3", 0.},
       {"plastic_strain4", 0.},
-      {"plastic_strain5", 0.}};
+      {"plastic_strain5", 0.},
+      // Plastic deviatoric strain, smoothed
+      {"pdstrain_smooth", 0.}};
 
   return state_vars;
 }
@@ -108,7 +110,7 @@ std::vector<std::string> mpm::NorSand<Tdim>::state_variables() const {
       "p_image",         "p_cohesion",      "p_dilation",
       "pdstrain",        "plastic_strain0", "plastic_strain1",
       "plastic_strain2", "plastic_strain3", "plastic_strain4",
-      "plastic_strain5"};
+      "plastic_strain5", "pdstrain_smooth"};
   return state_vars;
 }
 

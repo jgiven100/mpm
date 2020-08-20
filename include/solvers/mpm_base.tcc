@@ -1269,3 +1269,17 @@ void mpm::MPMBase<Tdim>::pressure_smoothing(unsigned phase) {
       std::bind(&mpm::ParticleBase<Tdim>::compute_pressure_smoothing,
                 std::placeholders::_1, phase));
 }
+
+//! MPM pdstrain smoothing
+template <unsigned Tdim>
+void mpm::MPMBase<Tdim>::pdstrain_smoothing(unsigned phase) {
+  // Map pdstrain to nodes
+  mesh_->iterate_over_particles(
+      std::bind(&mpm::ParticleBase<Tdim>::map_pdstrain_to_nodes,
+                std::placeholders::_1, phase));
+
+  // Smooth pdstrain over particles
+  mesh_->iterate_over_particles(
+      std::bind(&mpm::ParticleBase<Tdim>::compute_pdstrain_smoothing,
+                std::placeholders::_1, phase));
+}

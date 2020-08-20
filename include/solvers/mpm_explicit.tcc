@@ -292,6 +292,10 @@ bool mpm::MPMExplicit<Tdim>::solve() {
     if (this->stress_update_ == mpm::StressUpdate::USL)
       this->compute_stress_strain(phase);
 
+    // Smooth pdstrain for particle removal 
+    if (step_ % output_steps_ == 0)
+      this->pdstrain_smoothing(phase);
+
     // Check plastic strain particles
     if (step_ % 5000 == 0) {
       auto removing_particles = mesh_->check_plasticity_mesh();

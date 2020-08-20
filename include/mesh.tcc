@@ -988,7 +988,7 @@ std::vector<std::shared_ptr<mpm::ParticleBase<Tdim>>>
                   double mean_s = (-1. / 2.) * (stress[0] + stress[1]);
                   const double a = 0.0045;
                   const double b = 0.0;
-                  if (particle->state_variable("pdstrain") > (a + (mean_s * b)))
+                  if (particle->state_variable("pdstrain_smooth") > (a + (mean_s * b)))
                     particles.emplace_back(particle);
                 });
 

@@ -230,6 +230,14 @@ class ParticleBase {
   virtual bool compute_pressure_smoothing(
       unsigned phase = mpm::ParticlePhase::Solid) noexcept = 0;
 
+  //! Map particle pdstrain to nodes
+  virtual bool map_pdstrain_to_nodes(
+      unsigned phase = mpm::ParticlePhase::Solid) noexcept = 0;
+
+  //! Compute pdstrain smoothing of the particle based on nodal pressure
+  virtual bool compute_pdstrain_smoothing(
+      unsigned phase = mpm::ParticlePhase::Solid) noexcept = 0;
+
   //! Assign velocity
   virtual bool assign_velocity(const VectorDim& velocity) = 0;
 

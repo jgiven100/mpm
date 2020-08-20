@@ -28,6 +28,7 @@ void mpm::Node<Tdim, Tdof, Tnphases>::initialise() noexcept {
   external_force_.setZero();
   internal_force_.setZero();
   pressure_.setZero();
+  pdstrain_.setZero();
   contact_displacement_.setZero();
   velocity_.setZero();
   momentum_.setZero();
@@ -180,6 +181,22 @@ void mpm::Node<Tdim, Tdof, Tnphases>::assign_pressure(unsigned phase,
   node_mutex_.lock();
   pressure_(phase) = pressure;
   node_mutex_.unlock();
+}
+
+//! Update pdstrain at the nodes from particle
+template <unsigned Tdim, unsigned Tdof, unsigned Tnphases>
+void mpm::Node<Tdim, Tdof, Tnphases>::update_mass_pdstrain(
+    unsigned phase, double mass_pdstrain) noexcept {
+  // Assert
+  assert(phase < Tnphases);
+
+  const double tolerance = 0.;
+  // Compute pdstrain
+  if (pdstrain_(phase) >= tolerance) {
+    node_mutex_.lock();
+    pdstrain_(phase) += mass_pdstrain / mass_(phase);
+    node_mutex_.unlock();
+  }
 }
 
 //! Compute velocity from momentum

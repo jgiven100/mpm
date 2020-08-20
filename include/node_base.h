@@ -143,6 +143,16 @@ class NodeBase {
   //! \param[in] phase Index corresponding to the phase
   virtual double pressure(unsigned phase) const = 0;
 
+  //! Update pdstrain at the nodes from particle
+  //! \param[in] phase Index corresponding to the phase
+  //! \param[in] mass_pdstrain Product of mass x pdstrain of a particle
+  virtual void update_mass_pdstrain(unsigned phase,
+                                    double mass_pdstrain) noexcept = 0;
+
+  //! Return pdstrain at a given node for a given phase
+  //! \param[in] phase Index corresponding to the phase
+  virtual double pdstrain(unsigned phase) const = 0;
+
   //! Update nodal momentum
   //! \param[in] update A boolean to update (true) or assign (false)
   //! \param[in] phase Index corresponding to the phase

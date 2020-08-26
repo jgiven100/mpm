@@ -1,6 +1,11 @@
 #ifndef MPM_PARTICLEBASE_H_
 #define MPM_PARTICLEBASE_H_
 
+// MPI
+#ifdef USE_MPI
+#include "mpi.h"
+#endif
+
 #include <array>
 #include <limits>
 #include <memory>
@@ -20,6 +25,10 @@ class Material;
 
 //! Particle phases
 enum ParticlePhase : unsigned int { Solid = 0, Liquid = 1, Gas = 2 };
+
+//! Particle type
+extern std::map<std::string, int> ParticleType;
+extern std::map<int, std::string> ParticleTypeName;
 
 //! ParticleBase class
 //! \brief Base class that stores the information about particleBases
@@ -302,6 +311,20 @@ class ParticleBase {
 
   //! Removal criteria
   bool to_be_removed() const { return to_be_removed_; }
+  
+  //! Type of particle
+  virtual std::string type() const = 0;
+
+  //! Serialize
+  //! \retval buffer Serialized buffer data
+  virtual std::vector<uint8_t> serialize() = 0;
+
+  //! Deserialize
+  //! \param[in] buffer Serialized buffer data
+  //! \param[in] material Particle material pointers
+  virtual void deserialize(
+      const std::vector<uint8_t>& buffer,
+      std::vector<std::shared_ptr<mpm::Material<Tdim>>>& materials) = 0;
 
  protected:
   //! particleBase id

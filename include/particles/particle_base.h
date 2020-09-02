@@ -308,9 +308,6 @@ class ParticleBase {
 
   //! Return neighbour ids
   virtual std::vector<mpm::Index> neighbours() const = 0;
-
-  //! Removal criteria
-  bool to_be_removed() const { return to_be_removed_; }
   
   //! Type of particle
   virtual std::string type() const = 0;
@@ -349,8 +346,6 @@ class ParticleBase {
   std::vector<mpm::dense_map> state_variables_;
   //! Vector of particle neighbour ids
   std::vector<mpm::Index> neighbours_;
-  //! Removal criteria
-  bool to_be_removed_{false};
 };  // ParticleBase class
 }  // namespace mpm
 

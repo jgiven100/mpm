@@ -1032,27 +1032,9 @@ std::vector<std::shared_ptr<mpm::ParticleBase<Tdim>>>
                     const std::shared_ptr<mpm::ParticleBase<Tdim>>& particle) {
                   auto stress = particle->stress();
                   double mean_s = (-1. / 2.) * (stress[0] + stress[1]);
-                  const double a = 0.0010;
-                  const double b = 1.5E-10;
+                  const double a = 0.0045;
+                  const double b = 0.0;
                   if (particle->state_variable("pdstrain_smooth") > (a + (mean_s * b)))
-                    particles.emplace_back(particle);
-                });
-
-  return particles;
-}
-
-//! Check to_be_removed_ bool for particles
-template <unsigned Tdim>
-std::vector<std::shared_ptr<mpm::ParticleBase<Tdim>>>
-    mpm::Mesh<Tdim>::check_particle_bool() {
-
-  std::vector<std::shared_ptr<mpm::ParticleBase<Tdim>>> particles;
-
-  std::for_each(particles_.cbegin(), particles_.cend(),
-                [=, &particles](
-                    const std::shared_ptr<mpm::ParticleBase<Tdim>>& particle) {
-                  if (particle->to_be_removed() == true &&
-                      particle->state_variable("pdstrain") > 0.002)
                     particles.emplace_back(particle);
                 });
 

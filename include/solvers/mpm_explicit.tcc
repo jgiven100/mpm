@@ -146,27 +146,11 @@ bool mpm::MPMExplicit<Tdim>::solve() {
       auto removing_particles = mesh_->check_plasticity_mesh();
 
       if (!removing_particles.empty()) {
-        this->throw_event_ = true;
         for (auto i : removing_particles) {
           this->mass_loss_ += i->mass();
           std::cout << "Sand production particle (from Plastic Strain): "
                     << i->id() << '\t'
                     << "Cumulative mass loss: " << this->mass_loss_ << '\n';
-          mesh_->remove_particle(i);
-        }
-      }
-    }
-
-    // Check particle bool
-    if (throw_event_ == true && step_ % 5000 == 1) {
-      auto removing_particles = mesh_->check_particle_bool();
-
-      if (!removing_particles.empty()) {
-        for (auto i : removing_particles) {
-          this->mass_loss_ += i->mass();
-          std::cout << "Sand production particle (from Flush): " << i->id()
-                    << '\t' << "Cumulative mass loss: " << this->mass_loss_
-                    << '\n';
           mesh_->remove_particle(i);
         }
       }

@@ -6,6 +6,8 @@
 #endif
 
 #include "mpm_base.h"
+#include "particle_base.h"
+#include "particle.h"
 
 namespace mpm {
 
@@ -84,6 +86,9 @@ class MPMExplicit : public MPMBase<Tdim> {
 
   //! Mass loss
   double mass_loss_{0};
+
+  //! Zero stress list
+  std::vector<std::shared_ptr<mpm::ParticleBase<Tdim>>> zero_list_;
 
 };  // MPMExplicit class
 }  // namespace mpm

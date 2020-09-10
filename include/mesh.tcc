@@ -1032,10 +1032,12 @@ std::vector<std::shared_ptr<mpm::ParticleBase<Tdim>>>
                     const std::shared_ptr<mpm::ParticleBase<Tdim>>& particle) {
                   auto stress = particle->stress();
                   double mean_s = (-1. / 2.) * (stress[0] + stress[1]);
-                  const double a = 0.0045;
-                  const double b = 0.0;
-                  if (particle->state_variable("pdstrain_smooth") > (a + (mean_s * b)))
+                  const double a = 0.0010;
+                  const double b = 3.0E-10;
+                  if (particle->state_variable("pdstrain_smooth") > (a + (mean_s * b))){
                     particles.emplace_back(particle);
+                    particle->set_stress_zero();
+                  }
                 });
 
   return particles;

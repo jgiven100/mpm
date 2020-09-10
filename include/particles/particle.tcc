@@ -667,6 +667,18 @@ void mpm::Particle<Tdim>::compute_stress() noexcept {
                            &state_variables_[mpm::ParticlePhase::Solid]);
 }
 
+// Set stress to zero
+template <unsigned Tdim>
+void mpm::Particle<Tdim>::set_stress_zero() {
+  // Set stress
+  this->stress_[0] = 0.0;
+  this->stress_[1] = 0.0;
+  this->stress_[2] = 0.0;
+  this->stress_[3] = 0.0;
+  this->stress_[4] = 0.0;
+  this->stress_[5] = 0.0;
+}
+
 //! Map body force
 template <unsigned Tdim>
 void mpm::Particle<Tdim>::map_body_force(const VectorDim& pgravity) noexcept {

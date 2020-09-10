@@ -134,6 +134,13 @@ bool mpm::MPMExplicit<Tdim>::solve() {
     mpm_scheme_->compute_particle_kinematics(velocity_update_, phase, "Cundall",
                                              damping_factor_);
 
+    // Make sure stress is 0
+    if (!zero_list_.empty()){
+      for (auto i : zero_list_){
+        i->set_stress_zero();
+      }
+    }
+
     // Update Stress Last
     mpm_scheme_->postcompute_stress_strain(phase, pressure_smoothing_);
 
@@ -146,12 +153,16 @@ bool mpm::MPMExplicit<Tdim>::solve() {
       auto removing_particles = mesh_->check_plasticity_mesh();
 
       if (!removing_particles.empty()) {
+        for (auto i : removing_particles){
+          this->zero_list_.emplace_back(i);
+        }
+        this->mass_loss_ = 0;
         for (auto i : removing_particles) {
           this->mass_loss_ += i->mass();
           std::cout << "Sand production particle (from Plastic Strain): "
                     << i->id() << '\t'
                     << "Cumulative mass loss: " << this->mass_loss_ << '\n';
-          mesh_->remove_particle(i);
+        //   mesh_->remove_particle(i);
         }
       }
     }

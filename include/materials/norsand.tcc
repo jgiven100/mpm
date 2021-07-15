@@ -454,6 +454,10 @@ Eigen::Matrix<double, 6, 1> mpm::NorSand<Tdim>::compute_stress(
   // Set elastic tensor
   this->compute_elastic_tensor();
 
+  // Force drained strains
+  dstrain_neg(0) = -1. * de_(0,2) / (de_(0,0) + de_(0,1)) * dstrain_neg(2);
+  dstrain_neg(1) = -1. * de_(1,2) / (de_(1,0) + de_(1,1)) * dstrain_neg(2);
+
   // Trial stress - elastic
   Vector6d trial_stress = stress_neg + (this->de_ * dstrain_neg);
 
@@ -485,6 +489,12 @@ Eigen::Matrix<double, 6, 1> mpm::NorSand<Tdim>::compute_stress(
   // Plastic step
   // Compute D matrix used in stress update
   Matrix6x6 D_matrix = this->de_ - this->dp_;
+
+  // Force drained strains
+  dstrain_neg(0) =
+      -1. * D_matrix(0,2) / (D_matrix(0,0) + D_matrix(0,1)) * dstrain_neg(2);
+  dstrain_neg(1) =
+      -1. * D_matrix(1,2) / (D_matrix(1,0) + D_matrix(1,1)) * dstrain_neg(2);
 
   // Update stress
   Vector6d updated_stress = stress_neg + D_matrix * dstrain_neg;
